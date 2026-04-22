@@ -1,0 +1,35 @@
+{
+  "metadata_only": {
+    "n_features": 11,
+    "best_iteration": 113,
+    "xgb_test_accuracy": 0.3924467626181419,
+    "agreement_rate": 0.200909839601553,
+    "n_agree": 5123,
+    "n_total": 25499,
+    "deberta_acc_when_agree": 0.8426703103650205,
+    "deberta_acc_when_disagree": 0.46981743227326267,
+    "gap": 0.3728528780917578
+  },
+  "tfidf_only": {
+    "n_features": 500,
+    "best_iteration": 402,
+    "xgb_test_accuracy": 0.5335111180830621,
+    "agreement_rate": 0.44566453586415156,
+    "n_agree": 11364,
+    "n_total": 25499,
+    "deberta_acc_when_agree": 0.783878915874692,
+    "deberta_acc_when_disagree": 0.3524584365051291,
+    "gap": 0.43142047936956296
+  },
+  "full": {
+    "n_features": 516,
+    "best_iteration": 353,
+    "xgb_test_accuracy": 0.6608494450762775,
+    "agreement_rate": 0.46578297188125023,
+    "n_agree": 11877,
+    "n_total": 25499,
+    "deberta_acc_when_agree": 0.8583817462322135,
+    "deberta_acc_when_disagree": 0.2712523858464249,
+    "gap": 0.5871293603857886
+  }
+}

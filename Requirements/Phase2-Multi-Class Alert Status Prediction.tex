@@ -1,0 +1,205 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Mozila dataset project ideas}
+\author{ Naser Ezzati-Jivan }
+\date{December 2025}
+
+\begin{document}
+\maketitle
+\section{Phase 2: Multi-Class Alert Status Prediction}
+\label{sec:phase2}
+
+
+
+\subsection{Goal and Motivation}
+Phase 2 extends the binary regression classification problem introduced in Phase 1 into a multi-class prediction task. Each alert in Mozilla’s dataset is assigned a status that reflects the decision made by performance engineers during triage. The possible statuses include \texttt{Invalid}, \texttt{Downstream}, \texttt{Reassigned}, \texttt{Improvement}, \texttt{Investigating}, \texttt{Wontfix}, \texttt{Fixed}, and \texttt{Backedout}. These categories represent different engineering actions and reasoning steps, and predicting them can help quantify the triage workflow and identify factors that influence engineering decisions.
+
+From a research perspective, Phase 2 asks whether metadata alone can capture the complex decision-making process of human engineers. The student learns how to manage imbalanced data, evaluate multi-class models, and interpret results using per-class metrics. This phase builds on the foundation of Phase 1 and contributes toward understanding performance triage in large-scale continuous integration systems.
+
+\subsection{Objectives and Research Questions}
+
+The main objective of Phase 2 is to train and evaluate a multi-class classification model that predicts the \texttt{single\_alert\_status} for each alert. This provides insight into patterns in the triage process and prepares the foundation for more complex tasks in later phases.
+
+\subsubsection{Main Objective}
+The primary objective is to determine whether the alert-level metadata that was used in Phase 1 can also predict specific triage outcomes assigned by Mozilla engineers, rather than only the binary regression label.
+
+\subsubsection{Sub-Objectives}
+\begin{itemize}
+    \item Identify which metadata fields are most informative for predicting triage outcomes.
+    \item Handle imbalanced classes using techniques such as class weighting or synthetic oversampling.
+    \item Evaluate model performance using per-class precision, recall, F1-score, and confusion matrices.
+    \item Compare simple models (Logistic Regression with softmax) with tree-based models (Random Forest, Gradient Boosting).
+    \item Test generalization by training on alerts from certain repositories and evaluating on unseen repositories.
+    \item Perform ablation studies to understand the importance of magnitude features, contextual metadata, and workflow-related fields.
+\end{itemize}
+
+\subsubsection{Research Questions}
+\begin{itemize}
+    \item \textbf{RQ1:} Can alert metadata accurately predict the human-assigned status of an alert in Mozilla's performance triage workflow?
+    \item \textbf{RQ2:} Which metadata features are most strongly associated with specific statuses such as \texttt{Invalid}, \texttt{Downstream}, and \texttt{Fixed}?
+    \item \textbf{RQ3:} Are there significant differences in model accuracy across repositories, platforms, or test suites?
+    \item \textbf{RQ4:} How do magnitude-based features compare to contextual features when predicting complex triage decisions?
+    \item \textbf{RQ5:} Can a multi-class model highlight ambiguous or inconsistent triage decisions, suggesting areas where automation might assist engineers?
+\end{itemize}
+
+\subsection{Data Used}
+Phase 2 uses the same file as Phase 1:
+\begin{itemize}
+    \item \textbf{\texttt{data/alerts\_data.csv}}: contains metadata for all alerts, including the status assigned during triage.
+\end{itemize}
+
+The target variable is:
+\begin{itemize}
+    \item \textbf{\texttt{single\_alert\_status}}: the triage outcome assigned by Mozilla engineers.
+\end{itemize}
+
+Unlike Phase 1, the label has multiple categories, and some classes may be rare.
+
+\subsection{Problem Definition}
+We define a multi-class classification problem:
+\begin{equation}
+    f(\mathbf{x}) \rightarrow y,\ \ \ y \in \{\text{Invalid}, \text{Downstream}, \text{Fixed}, \text{Wontfix}, \text{Improvement}, ...\}
+\end{equation}
+where $\mathbf{x}$ is the metadata feature vector, and $y$ is the triage status.
+
+\subsection{Feature Set}
+The feature set for Phase 2 is identical to Phase 1, but workflow features become more relevant because the goal is to model triage behavior, not only detect regressions.
+
+\paragraph{Magnitude and statistical features.}
+\begin{itemize}
+    \item \texttt{single\_alert\_amount\_abs}
+    \item \texttt{single\_alert\_amount\_pct}
+    \item \texttt{single\_alert\_t\_value}
+\end{itemize}
+
+\paragraph{Contextual features.}
+\begin{itemize}
+    \item \texttt{repository\_name}
+    \item \texttt{machine\_platform}
+    \item \texttt{framework\_id}
+    \item \texttt{single\_alert\_series\_signature\_suite}
+\end{itemize}
+
+\paragraph{Workflow features.}
+These become more important in Phase 2:
+\begin{itemize}
+    \item \texttt{single\_alert\_manually\_created}
+    \item \texttt{alert\_summary\_assignee\_username}
+    \item \texttt{alert\_summary\_bug\_number} (include only if set at creation time)
+\end{itemize}
+
+Leakage checks from Phase 1 still apply: no features from after triage should be included.
+
+\subsection{Implementation Steps}
+
+\paragraph{Step 1: Data loading and preprocessing.}
+Load \texttt{alerts\_data.csv}, filter out alerts with missing \texttt{single\_alert\_status}, and drop identifiers.
+
+\paragraph{Step 2: Handle class imbalance.}
+\begin{itemize}
+    \item Compute class counts.
+    \item Apply class weights in Logistic Regression or tree models.
+    \item Optionally use SMOTE for minority classes.
+\end{itemize}
+
+Example:
+\begin{verbatim}
+from sklearn.utils.class_weight import compute_class_weight
+classes = alerts["single_alert_status"].unique()
+weights = compute_class_weight("balanced", classes=classes,
+                               y=alerts["single_alert_status"])
+\end{verbatim}
+
+\paragraph{Step 3: Encode categorical variables.}
+Use one-hot encoding for small categories and frequency encoding for large categories.
+
+\paragraph{Step 4: Model selection.}
+Models suitable for multi-class classification:
+\begin{itemize}
+    \item Logistic Regression with softmax
+    \item Random Forest
+    \item XGBoost or LightGBM with multi-class objective
+\end{itemize}
+
+\paragraph{Step 5: Evaluation.}
+Compute:
+\begin{itemize}
+    \item Per-class precision and recall
+    \item Macro- and micro-averaged F1-score
+    \item Full confusion matrix
+\end{itemize}
+
+\paragraph{Step 6: Feature importance and interpretation.}
+Use:
+\begin{itemize}
+    \item Tree-based feature importance
+    \item Permutation importance
+    \item SHAP values for multi-class outputs
+\end{itemize}
+
+\subsection{Experimental Design}
+
+\paragraph{Experiment E1: Baseline multi-class classification.}
+Train Logistic Regression, Random Forest, and XGBoost on the full feature set. Evaluate which model handles imbalance and multi-class structure best.
+
+\paragraph{Experiment E2: Repository-level generalization.}
+Train on autoland repositories and test on mozilla-central or mozilla-beta to determine whether triage patterns differ across contexts.
+
+\paragraph{Experiment E3: Feature ablation for triage prediction.}
+Evaluate the accuracy of:
+\begin{itemize}
+    \item magnitude-only features,
+    \item context-only features,
+    \item workflow-only features,
+    \item combinations of these groups.
+\end{itemize}
+
+This clarifies which aspects of alert metadata influence triage outcomes.
+
+\subsection{Concrete Examples of Alerts}
+
+\paragraph{Example 1: Invalid alert.}
+A low-magnitude alert occurring on a noisy platform is often labeled as \texttt{Invalid}. These alerts form a large portion of the dataset.
+
+\paragraph{Example 2: Downstream alert.}
+Downstream alerts appear shortly after a primary regression and often share the same summary. Metadata about the summary or test suite can help identify them.
+
+\paragraph{Example 3: Fixed alert.}
+If a corresponding bug is filed and resolved promptly, the alert may ultimately receive the status \texttt{Fixed}. Early metadata may partially reflect this pattern.
+
+\subsection{Expected Outcomes}
+Phase 2 is expected to produce:
+\begin{itemize}
+    \item A multi-class classifier that models Mozilla's triage decisions.
+    \item A confusion matrix showing which statuses are hard to predict.
+    \item A ranked list of features affecting specific triage outcomes.
+    \item Insights into the consistency or inconsistency of triage behavior.
+\end{itemize}
+
+\subsection{Reproducibility and Reporting}
+The student will maintain:
+\begin{itemize}
+    \item preprocessing scripts,
+    \item model training and evaluation notebooks,
+    \item per-class plots and confusion matrices,
+    \item a written report summarizing findings.
+\end{itemize}
+
+\subsection{Risks and Mitigations}
+\begin{itemize}
+    \item \textbf{Extreme class imbalance:} mitigate through class weighting and resampling.
+    \item \textbf{Label ambiguity:} some statuses may overlap conceptually; use coarse-grained grouping if needed.
+    \item \textbf{Feature leakage:} verify timestamps to ensure workflow features do not include post-triage information.
+\end{itemize}
+
+\subsection{Phase 2 Deliverables}
+At the end of Phase 2 the student will deliver:
+\begin{itemize}
+    \item A fully implemented multi-class classifier.
+    \item Model evaluations with per-class breakdown.
+    \item A generalization study across repositories.
+    \item A short written summary connecting findings back to the goals of regression triage analysis.
+\end{itemize}
+
+\end{document}

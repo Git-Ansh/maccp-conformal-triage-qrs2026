@@ -1,0 +1,221 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Mozila dataset project (ansh and deep patel)}
+\author{ Naser Ezzati-Jivan }
+
+\date{December 2025}
+
+\begin{document}
+\maketitle
+
+\section{Phase 3: Time-Series Feature Extraction for Regression Analysis}
+\label{sec:phase3}
+
+\subsection{Goal and Motivation}
+Phase 3 introduces time-series reasoning to improve the regression classification task. Unlike Phase 1 and Phase 2, which rely exclusively on alert-level metadata, this phase extracts additional information directly from the raw performance measurements stored in the time-series files. These signals describe how the performance metric behaved before, during, and after the alert. The goal is to enrich the predictive model by incorporating structural changes, stability patterns, drift indicators, and variability measures that cannot be captured by metadata alone.
+
+Time-series context is essential for understanding whether an alert reflects a meaningful change or simply noise. Two alerts might have similar magnitude values, yet one occurs after a long period of stability (suggesting a true regression), while the other occurs in a highly unstable region (suggesting noise). Thus, integrating time-series features provides deeper insights into regression dynamics and forms the technical foundation for Phases 4 and 5.
+
+\subsection{Objectives and Research Questions}
+
+\subsubsection{Main Objective}
+The primary objective of Phase~3 is to extract, engineer, and integrate time-series features around each alert to improve the performance of the regression detection model developed in Phase 1. These engineered features produce a richer representation of each alert that incorporates temporal behavior rather than relying exclusively on metadata.
+
+\subsubsection{Sub-Objectives}
+\begin{itemize}
+    \item Identify the relevant window size and sampling strategy around each alert for feature extraction.
+    \item Extract time-series characteristics such as slopes, volatility, drift, rolling differences, and local change metrics.
+    \item Integrate the new features into the Phase 1 pipeline while avoiding data leakage or dependence on future timestamps.
+    \item Compare the performance of metadata-only and metadata-plus-time-series models.
+    \item Conduct ablation studies to determine which time-series feature groups contribute most to classification accuracy.
+    \item Prepare a reusable feature extraction module that can be used in Phases 4 and 5 for change-point detection and forecasting experiments.
+\end{itemize}
+
+\subsubsection{Research Questions}
+\begin{itemize}
+    \item \textbf{RQ1:} Do time-series features improve the accuracy of regression classification beyond metadata alone?
+    \item \textbf{RQ2:} Which time-series characteristics (stability, variance, local slope, drift) are most predictive of regressions?
+    \item \textbf{RQ3:} What window size and feature extraction strategy captures contextual information without leaking future data?
+    \item \textbf{RQ4:} Does time-series behavior generalize consistently across different test suites and platforms?
+    \item \textbf{RQ5:} Can extracted time-series features help differentiate downstream alerts from primary alerts?
+\end{itemize}
+
+\subsection{Data Used}
+Phase 3 uses two datasets:
+\begin{itemize}
+    \item \textbf{\texttt{data/alerts\_data.csv}} (same metadata used in Phase 1).
+    \item \textbf{\texttt{data/timeseries\_data/}}: folder containing one file per signature. Each file includes revision-by-revision measurements representing the performance history of the test that triggered the alert.
+\end{itemize}
+
+The student will align each alert with the corresponding signature file using the \texttt{signature\_id} field.
+
+\subsection{Problem Definition}
+To incorporate temporal context, we define a feature extraction function:
+\begin{equation}
+    g(\mathbf{s}, t) \rightarrow \mathbf{z}
+\end{equation}
+where $\mathbf{s}$ is the time series for the signature, $t$ is the index of the alert in this time series (that is, the position of the revision that triggered the alert), and $\mathbf{z}$ is a vector of engineered features.
+
+The regression classifier from Phase 1 then becomes:
+\begin{equation}
+    f([\mathbf{x}, \mathbf{z}]) \rightarrow y
+\end{equation}
+where $\mathbf{x}$ is metadata and $\mathbf{z}$ is time-series context.
+
+\subsection{Time-Series Feature Set}
+
+The features fall into several groups.
+
+\paragraph{Local window statistics (before the alert).}
+Extracted over a window $W$ revisions before the alert index $t$:
+\begin{itemize}
+    \item mean and median of measurements,
+    \item standard deviation (volatility),
+    \item coefficient of variation,
+    \item rolling minimum and maximum.
+\end{itemize}
+
+\paragraph{Local change metrics.}
+\begin{itemize}
+    \item difference between the mean of $W$ measurements before and the alert value,
+    \item normalized change: $(v_{t} - \text{mean}_{t-W:t}) / \text{std}_{t-W:t}$,
+    \item local slope using linear regression over the last $W$ points.
+\end{itemize}
+
+\paragraph{Stability and noise indicators.}
+\begin{itemize}
+    \item ratio of recent variance to long-term variance,
+    \item number of direction changes (up versus down movements) in the window,
+    \item spectral density or simple frequency-domain variability.
+\end{itemize}
+
+\paragraph{Drift and trend measurements.}
+\begin{itemize}
+    \item difference in slope between two windows: $W_{1}$ before the alert and $W_{2}$ earlier,
+    \item cumulative sum deviations,
+    \item exponentially weighted moving average (EWMA) statistics.
+\end{itemize}
+
+\paragraph{Optional: post-alert features (no leakage).}
+These can be used \emph{only if they occur after the alert is raised but before triage}. They require strict timestamp checks and may be omitted to avoid any leakage.
+
+\subsection{Implementation Steps}
+
+\paragraph{Step 1: Identify the alert index in each time series.}
+Match each alert to its signature file. For each alert, find the revision index $t$ corresponding to \texttt{single\_alert\_new\_value} in the series.
+
+\paragraph{Step 2: Define extraction window size.}
+Typical choices:
+\begin{itemize}
+    \item $W = 10$ revisions,
+    \item $W = 20$ revisions,
+\end{itemize}
+depending on test frequency and noise.
+
+\paragraph{Step 3: Extract pre-alert windows.}
+Extract measurements from positions $[t-W, t-1]$. Handle cases where there are fewer than $W$ preceding points by skipping or padding.
+
+\paragraph{Step 4: Compute time-series features.}
+Implement custom functions or use a library such as \texttt{tsfresh} or \texttt{Kats}. Ensure that all extracted features are numeric.
+
+\paragraph{Step 5: Merge features with metadata.}
+Concatenate the new feature matrix with the features from Phase 1. Each alert now has an augmented feature vector.
+
+\paragraph{Step 6: Train updated models.}
+Repeat the modeling approach from Phase 1 using:
+\begin{itemize}
+    \item Logistic Regression,
+    \item Random Forest,
+    \item Gradient Boosting (for example XGBoost or LightGBM).
+\end{itemize}
+
+\paragraph{Step 7: Evaluate impact of time-series features.}
+Compare accuracy, precision, recall, and F1-score against Phase 1. Produce plots that show model performance with and without time-series features.
+
+\subsection{Experimental Design}
+
+\paragraph{Experiment E1: Baseline comparison.}
+Train regression classifiers using:
+\begin{itemize}
+    \item metadata-only features (Phase 1 baseline),
+    \item metadata plus time-series features (Phase 3 model).
+\end{itemize}
+
+\paragraph{Experiment E2: Window size sensitivity.}
+Evaluate different window sizes. Compare W=10, W=20, and W=30.
+
+\paragraph{Experiment E3: Feature-group ablation.}
+Test models with:
+\begin{itemize}
+    \item early-window features only,
+    \item volatility-related features only,
+    \item slope and drift features only,
+    \item all time-series features.
+\end{itemize}
+
+\paragraph{Experiment E4: Cross-repository generalization with time-series features.}
+Repeat the generalization tests from Phase 1. Determine whether time-series signals reduce repository-specific bias.
+
+\subsection{Concrete Examples}
+
+\paragraph{Example 1: Stable plateau before regression.}
+A time series with low variance followed by a sudden increase often indicates a meaningful regression. Time-series features will show:
+\begin{itemize}
+    \item low pre-alert variance,
+    \item high normalized change,
+    \item strong positive slope near the alert.
+\end{itemize}
+
+\paragraph{Example 2: High volatility before the alert.}
+A noisy test suite produces many fluctuations that mimic regressions. Time-series features capture:
+\begin{itemize}
+    \item high local variance,
+    \item low signal-to-noise ratio,
+    \item frequent direction changes,
+\end{itemize}
+which are indicators of noise rather than regressions.
+
+\paragraph{Example 3: Drift over time.}
+Slow performance degradation across revisions results in:
+\begin{itemize}
+    \item moderate slope before the alert,
+    \item higher long-term variance,
+    \item different slopes between earlier and recent windows.
+\end{itemize}
+
+\subsection{Expected Outcomes}
+Phase 3 is expected to produce:
+\begin{itemize}
+    \item A feature extraction module for time-series analysis.
+    \item An enhanced classifier with improved regression detection accuracy.
+    \item Evidence that time-series behavior adds value beyond metadata.
+    \item A structured feature taxonomy for future change-point and forecasting experiments.
+\end{itemize}
+
+\subsection{Reproducibility and Reporting}
+To ensure reproducibility:
+\begin{itemize}
+    \item save raw extraction scripts,
+    \item document extraction windows and parameters,
+    \item maintain consistent random seeds,
+    \item generate comparison tables for all experiments.
+\end{itemize}
+
+\subsection{Risks and Mitigations}
+\begin{itemize}
+    \item \textbf{Missing or sparse time-series history:} skip alerts with insufficient window size or use padding.
+    \item \textbf{Performance cost of extraction:} batch processing and incremental loading of CSVs can control memory usage.
+    \item \textbf{Feature leakage:} ensure no post-alert values are included.
+\end{itemize}
+
+\subsection{Phase 3 Deliverables}
+\begin{itemize}
+    \item A complete extraction module implementing all time-series features.
+    \item A merged feature table combining metadata and time-series features.
+    \item Updated classification models with evaluation reports.
+    \item A written analysis comparing metadata-only and time-series-augmented models.
+\end{itemize}
+
+
+\end{document}

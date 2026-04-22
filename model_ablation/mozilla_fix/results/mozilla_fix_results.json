@@ -1,0 +1,179 @@
+{
+  "old_test_acc": 0.3625,
+  "new_test_acc": 0.5038915094339622,
+  "new_version": "B",
+  "new_best_iteration": 86,
+  "old_agreement_rate": 0.26839622641509436,
+  "new_agreement_rate": 0.3087264150943396,
+  "n_engineered_features": 55,
+  "hybrid_results": {
+    "A: DEB/DEB_alpha0.05": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.9568372803666921,
+        "mean_set": 4.745607333842628,
+        "singleton_rate": 0.2799847211611918,
+        "singleton_acc": 0.9713506139154161
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.9094165813715456,
+        "mean_set": 12.346639372227909
+      }
+    },
+    "B: newXGB/newXGB_alpha0.05": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.9576012223071046,
+        "mean_set": 5.845683728036669,
+        "singleton_rate": 0.22345301757066463,
+        "singleton_acc": 0.9931623931623932
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.9177755032412146,
+        "mean_set": 11.826850904128284
+      }
+    },
+    "C: DEB/newXGB_alpha0.05": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.9568372803666921,
+        "mean_set": 4.745607333842628,
+        "singleton_rate": 0.2799847211611918,
+        "singleton_acc": 0.9713506139154161
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.9177755032412146,
+        "mean_set": 11.826850904128284
+      }
+    },
+    "D: newXGB/DEB_alpha0.05": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.9576012223071046,
+        "mean_set": 5.845683728036669,
+        "singleton_rate": 0.22345301757066463,
+        "singleton_acc": 0.9931623931623932
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.9094165813715456,
+        "mean_set": 12.346639372227909
+      }
+    },
+    "A: DEB/DEB_alpha0.1": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.9358288770053476,
+        "mean_set": 3.661955691367456,
+        "singleton_rate": 0.42016806722689076,
+        "singleton_acc": 0.9627272727272728
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.8688161037188673,
+        "mean_set": 10.399522347321733
+      }
+    },
+    "B: newXGB/newXGB_alpha0.1": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.9365928189457601,
+        "mean_set": 4.463712757830405,
+        "singleton_rate": 0.3082505729564553,
+        "singleton_acc": 0.9578686493184635
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.879051518253156,
+        "mean_set": 9.147389969293757
+      }
+    },
+    "C: DEB/newXGB_alpha0.1": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.9358288770053476,
+        "mean_set": 3.661955691367456,
+        "singleton_rate": 0.42016806722689076,
+        "singleton_acc": 0.9627272727272728
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.879051518253156,
+        "mean_set": 9.147389969293757
+      }
+    },
+    "D: newXGB/DEB_alpha0.1": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.9365928189457601,
+        "mean_set": 4.463712757830405,
+        "singleton_rate": 0.3082505729564553,
+        "singleton_acc": 0.9578686493184635
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.8688161037188673,
+        "mean_set": 10.399522347321733
+      }
+    },
+    "A: DEB/DEB_alpha0.2": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.8941940412528648,
+        "mean_set": 2.6187929717341483,
+        "singleton_rate": 0.46715049656226126,
+        "singleton_acc": 0.9607522485690924
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.7780620948481747,
+        "mean_set": 7.650460593654043
+      }
+    },
+    "B: newXGB/newXGB_alpha0.2": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.917494270435447,
+        "mean_set": 3.1508785332314746,
+        "singleton_rate": 0.4484339190221543,
+        "singleton_acc": 0.9412265758091993
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.8092801091777551,
+        "mean_set": 6.602354145342886
+      }
+    },
+    "C: DEB/newXGB_alpha0.2": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.8941940412528648,
+        "mean_set": 2.6187929717341483,
+        "singleton_rate": 0.46715049656226126,
+        "singleton_acc": 0.9607522485690924
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.8092801091777551,
+        "mean_set": 6.602354145342886
+      }
+    },
+    "D: newXGB/DEB_alpha0.2": {
+      "agree": {
+        "n": 2618,
+        "coverage": 0.917494270435447,
+        "mean_set": 3.1508785332314746,
+        "singleton_rate": 0.4484339190221543,
+        "singleton_acc": 0.9412265758091993
+      },
+      "disagree": {
+        "n": 5862,
+        "coverage": 0.7780620948481747,
+        "mean_set": 7.650460593654043
+      }
+    }
+  }
+}

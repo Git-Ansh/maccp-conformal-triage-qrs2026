@@ -1,0 +1,16 @@
+{
+  "budget": 34.0,
+  "total_cost": 13.589326000002227,
+  "remaining": 20.410673999997773,
+  "elapsed_seconds": 4944.310397148132,
+  "models": {
+    "glm-5": {
+      "calls": 71481,
+      "input_tokens": 10308046,
+      "output_tokens": 1025400,
+      "cost_input": 10.308046,
+      "cost_output": 3.28128,
+      "cost_total": 13.589326
+    }
+  }
+}

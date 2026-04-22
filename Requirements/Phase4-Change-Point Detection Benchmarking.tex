@@ -1,0 +1,205 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Mozila dataset project (ansh and deep patel)}
+\author{ Naser Ezzati-Jivan }
+
+\date{December 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Phase 4: Change-Point Detection Benchmarking}
+\label{sec:phase4}
+
+\subsection{Goal and Motivation}
+Phase 4 evaluates classical and modern change-point detection algorithms on Mozilla’s performance time series. Change-point detection aims to identify structural changes in a sequence without relying on supervised labels. These changes may indicate regressions, noise spikes, warm-up effects, hardware variability, or other anomalies. Mozilla’s dataset provides a valuable opportunity for benchmarking because it contains both raw time series and alert metadata that mark known regression points.
+
+The purpose of this phase is to determine whether established statistical and algorithmic change-point detection methods can reliably detect regressions in noisy, real-world CI performance data. This phase builds directly on the time-series feature extraction work from Phase 3 and prepares the foundation for forecasting-based methods in Phase 5.
+
+\subsection{Objectives and Research Questions}
+
+\subsubsection{Main Objective}
+The primary objective of Phase 4 is to benchmark multiple change-point detection algorithms on Mozilla’s performance time series and evaluate their accuracy by comparing detected change points against known regression events.
+
+\subsubsection{Sub-Objectives}
+\begin{itemize}
+    \item Prepare uniform time-series windows aligned with alert timestamps using the extraction methods developed in Phase~3.
+    \item Apply multiple change-point detection algorithms including CUSUM, Binary Segmentation, PELT, Window-based Change Detection, and Bayesian Online Change Detection (BOCD).
+    \item Evaluate precision, recall, false-positive rate, and detection delay relative to Mozilla’s labeled regression points.
+    \item Compare algorithm performance across test suites, platforms, and repositories.
+    \item Investigate algorithm sensitivity to window size, penalty parameters, and noise levels.
+    \item Document strengths, limitations, and failure cases of traditional change-point detection in the context of Mozilla’s noisy CI environment.
+\end{itemize}
+
+\subsubsection{Research Questions}
+\begin{itemize}
+    \item \textbf{RQ1:} Do classical change-point detection algorithms reliably detect regressions in Mozilla’s CI performance data?
+    \item \textbf{RQ2:} Which types of regressions (large jumps, slow drifts, volatility shifts) are easiest or hardest to detect?
+    \item \textbf{RQ3:} How sensitive are different algorithms to hyperparameters such as penalty values, cost functions, and window lengths?
+    \item \textbf{RQ4:} Does performance vary significantly across test frameworks or machine platforms?
+    \item \textbf{RQ5:} Can change-point algorithms reduce false positives relative to metadata-only regression detection?
+\end{itemize}
+
+\subsection{Data Used}
+Phase 4 uses the time-series data from:
+\begin{itemize}
+    \item \textbf{\texttt{data/timeseries\_data/\*/\*.csv}}: each file corresponds to a signature and contains chronological performance measurements.
+\end{itemize}
+
+Known regression points come from:
+\begin{itemize}
+    \item \textbf{\texttt{alerts\_data.csv}}, using the subset of alerts labeled as regressions in Phase~1.
+\end{itemize}
+
+Each regression alert provides a ground-truth change point, allowing supervised evaluation of algorithm outputs.
+
+\subsection{Problem Definition}
+Formally, a change-point detection algorithm takes a time series:
+\begin{equation}
+    \mathbf{s} = (s_1, s_2, \dots, s_n)
+\end{equation}
+and returns a set of estimated change-point indices:
+\begin{equation}
+    \widehat{C} = \{\hat{c}_1, \hat{c}_2, \dots \}
+\end{equation}
+
+For each true regression point $c$ (from alert metadata), detection is correct if:
+\begin{equation}
+    |\hat{c} - c| \leq \delta
+\end{equation}
+where $\delta$ is a tolerance window (for example 3–5 revisions).
+
+\subsection{Algorithms Evaluated}
+
+\paragraph{CUSUM (Cumulative Sum).}
+A classical method that detects sustained changes in mean. Effective for abrupt shifts.
+
+\paragraph{Binary Segmentation.}
+A greedy recursive algorithm that identifies multiple change points by splitting the sequence at detected changes.
+
+\paragraph{PELT (Pruned Exact Linear Time).}
+A dynamic programming algorithm minimizing a cost function plus a penalty term. Efficient and widely used in practice.
+
+\paragraph{Window-based change detection.}
+Uses adjacent sliding windows to identify differences in local statistics (mean, variance, slope).
+
+\paragraph{Bayesian Online Change Detection (BOCD).}
+Probabilistic method based on online inference of run lengths. Suitable for streaming CI scenarios.
+
+\subsection{Implementation Steps}
+
+\paragraph{Step 1: Extract time series for each regression alert.}
+Use the extraction workflow from Phase 3 to load the signature file, locate the alert index, and extract a window of $N$ points before and after the alert.
+
+\paragraph{Step 2: Preprocess the time series.}
+\begin{itemize}
+    \item Remove outliers (for example using IQR or z-score).
+    \item Optionally smooth with a rolling mean to reduce hardware noise.
+    \item Normalize if required (for example zero-mean scaling).
+\end{itemize}
+
+\paragraph{Step 3: Run change-point detection algorithms.}
+For each algorithm:
+\begin{itemize}
+    \item select suitable cost function (for example mean shift, linear trend),
+    \item choose penalty values (for example BIC, AIC, manually tuned),
+    \item run the algorithm on the extracted time series,
+    \item record detected change points $\widehat{C}$.
+\end{itemize}
+
+Python ecosystem options include:
+\begin{itemize}
+    \item \texttt{ruptures} for CUSUM, PELT, Binary Segmentation,
+    \item custom implementation or \texttt{bayesian-changepoint-detection} for BOCD.
+\end{itemize}
+
+\paragraph{Step 4: Compare detected points to ground truth.}
+Evaluate detection correctness using a tolerance window $\delta$.
+
+\paragraph{Step 5: Compute metrics.}
+\begin{itemize}
+    \item precision,
+    \item recall,
+    \item F1-score,
+    \item false positive rate,
+    \item detection delay: $\hat{c} - c$.
+\end{itemize}
+
+\paragraph{Step 6: Aggregate results across signatures.}
+Group results by:
+\begin{itemize}
+    \item test suite,
+    \item framework,
+    \item platform,
+    \item repository.
+\end{itemize}
+
+This reveals whether some environments are more amenable to change-point detection.
+
+\subsection{Experimental Design}
+
+\paragraph{Experiment E1: Single-change detection comparison.}
+Evaluate each algorithm on time series with one known regression point.
+
+\paragraph{Experiment E2: Multiple-change detection.}
+Some time series contain several anomalies. Evaluate how algorithms detect multiple changes and handle noise.
+
+\paragraph{Experiment E3: Sensitivity to noise and smoothing.}
+Compare results with raw vs.\ smoothed signals to see whether smoothing improves detection accuracy.
+
+\paragraph{Experiment E4: Hyperparameter tuning.}
+Vary penalty values for PELT, window sizes for window-based methods, and hazard functions for BOCD.
+
+\paragraph{Experiment E5: Cross-suite performance.}
+Determine whether certain test suites produce more reliable change-point detection signals.
+
+\subsection{Concrete Examples}
+
+\paragraph{Example 1: Abrupt mean shift.}
+A clear regression causes a sudden upward shift. Algorithms like CUSUM and PELT detect it reliably.
+
+\paragraph{Example 2: Slow drift.}
+Gradual performance degradation may not produce a sharp change point. Drift-sensitive cost functions or BOCD may perform better.
+
+\paragraph{Example 3: High noise environment.}
+Some CI tests fluctuate significantly. Algorithms may detect many false positives unless penalty values are tuned.
+
+\subsection{Expected Outcomes}
+Phase 4 is expected to produce:
+\begin{itemize}
+    \item A benchmark comparing classical and modern change-point detection algorithms.
+    \item Quantitative metrics showing which algorithms perform best in different conditions.
+    \item Insights into which types of regressions are detectable using unsupervised methods.
+    \item A reusable evaluation framework for change-point detection in noisy CI environments.
+\end{itemize}
+
+\subsection{Reproducibility and Reporting}
+The student will maintain:
+\begin{itemize}
+    \item scripts for running each change-point algorithm,
+    \item consistent evaluation parameters and tolerance thresholds,
+    \item plots illustrating detected vs.\ true change points,
+    \item summary tables for cross-algorithm comparison.
+\end{itemize}
+
+\subsection{Risks and Mitigations}
+\begin{itemize}
+    \item \textbf{High noise levels:} apply smoothing or variance-based preprocessing.
+    \item \textbf{Sparse time series:} reduce the window size or exclude incomplete sequences.
+    \item \textbf{Algorithm sensitivity:} tune penalty parameters and validate results across suites.
+\end{itemize}
+
+\subsection{Phase 4 Deliverables}
+\begin{itemize}
+    \item A benchmark report comparing change-point algorithms.
+    \item Code to run and visualize multiple detection methods.
+    \item Summary plots showing where each algorithm succeeds or fails.
+    \item A written analysis connecting findings to regression detection needs.
+\end{itemize}
+
+
+
+
+\end{document}

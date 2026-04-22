@@ -1,0 +1,254 @@
+{
+  "glm-5_eclipse": {
+    "model": "glm-5",
+    "dataset": "eclipse",
+    "cal_accuracy": 0.04853748882360455,
+    "test_accuracy": 0.057787174066243834,
+    "cal_valid_rate": 0.26081886930739245,
+    "test_valid_rate": 0.05564924114671164,
+    "cal_agreement_with_xgb": 0.012759436319418995,
+    "test_agreement_with_xgb": 0.0036472018510529825,
+    "n_cal": 30017,
+    "n_test": 25499,
+    "errors_cal": 44,
+    "errors_test": 20488,
+    "unmatched_cal": 22144,
+    "unmatched_test": 3592,
+    "maccp": {
+      "llm_agree_xgb_disagree_alpha0.05": {
+        "overall": {
+          "description": "MACCP overall",
+          "coverage": 0.959331738499549,
+          "mean_set_size": 15.285383740538844,
+          "median_set_size": 9.0,
+          "singleton_rate": 0.0120789050551002,
+          "singleton_accuracy": 0.9675324675324676,
+          "n": 25499,
+          "q_agree": 1.0863720178604126,
+          "q_disagree": 0.9726452827453613,
+          "n_cal_agree": 17871,
+          "n_cal_disagree": 12146,
+          "n_test_agree": 11913,
+          "n_test_disagree": 13586,
+          "alpha": 0.05
+        },
+        "agree": {
+          "description": "MACCP agree",
+          "coverage": 0.9474523629648284,
+          "mean_set_size": 26.6555023923445,
+          "median_set_size": 27.0,
+          "singleton_rate": 0.0,
+          "singleton_accuracy": 0.0,
+          "n": 11913
+        },
+        "disagree": {
+          "description": "MACCP disagree",
+          "coverage": 0.9697482702782276,
+          "mean_set_size": 5.315398204033564,
+          "median_set_size": 4.0,
+          "singleton_rate": 0.02267039599587811,
+          "singleton_accuracy": 0.9675324675324676,
+          "n": 13586
+        }
+      },
+      "llm_agree_xgb_disagree_alpha0.1": {
+        "overall": {
+          "description": "MACCP overall",
+          "coverage": 0.929879603121691,
+          "mean_set_size": 13.81626730460018,
+          "median_set_size": 8.0,
+          "singleton_rate": 0.034393505627671676,
+          "singleton_accuracy": 0.9304446978335233,
+          "n": 25499,
+          "q_agree": 1.0213240385055542,
+          "q_disagree": 0.937832236289978,
+          "n_cal_agree": 17871,
+          "n_cal_disagree": 12146,
+          "n_test_agree": 11913,
+          "n_test_disagree": 13586,
+          "alpha": 0.1
+        },
+        "agree": {
+          "description": "MACCP agree",
+          "coverage": 0.9149668429446823,
+          "mean_set_size": 24.54066985645933,
+          "median_set_size": 25.0,
+          "singleton_rate": 0.0,
+          "singleton_accuracy": 0.0,
+          "n": 11913
+        },
+        "disagree": {
+          "description": "MACCP disagree",
+          "coverage": 0.9429559841012807,
+          "mean_set_size": 4.412483438834094,
+          "median_set_size": 4.0,
+          "singleton_rate": 0.06455174444280877,
+          "singleton_accuracy": 0.9304446978335233,
+          "n": 13586
+        }
+      },
+      "llm_agree_xgb_disagree_alpha0.2": {
+        "overall": {
+          "description": "MACCP overall",
+          "coverage": 0.8794854700184321,
+          "mean_set_size": 12.173732303227577,
+          "median_set_size": 7.0,
+          "singleton_rate": 0.08149339189772148,
+          "singleton_accuracy": 0.8681424446583254,
+          "n": 25499,
+          "q_agree": 0.9368135333061218,
+          "q_disagree": 0.8620946407318115,
+          "n_cal_agree": 17871,
+          "n_cal_disagree": 12146,
+          "n_test_agree": 11913,
+          "n_test_disagree": 13586,
+          "alpha": 0.2
+        },
+        "agree": {
+          "description": "MACCP agree",
+          "coverage": 0.8791236464366659,
+          "mean_set_size": 22.36842105263158,
+          "median_set_size": 23.0,
+          "singleton_rate": 0.0,
+          "singleton_accuracy": 0.0,
+          "n": 11913
+        },
+        "disagree": {
+          "description": "MACCP disagree",
+          "coverage": 0.8798027381127631,
+          "mean_set_size": 3.234432504048285,
+          "median_set_size": 3.0,
+          "singleton_rate": 0.15295156779037244,
+          "singleton_accuracy": 0.8681424446583254,
+          "n": 13586
+        }
+      }
+    }
+  },
+  "glm-5_mozilla": {
+    "model": "glm-5",
+    "dataset": "mozilla",
+    "cal_accuracy": 0.0,
+    "test_accuracy": 0.0,
+    "cal_valid_rate": 0.0,
+    "test_valid_rate": 0.0,
+    "cal_agreement_with_xgb": 0.0,
+    "test_agreement_with_xgb": 0.0,
+    "n_cal": 8289,
+    "n_test": 8480,
+    "errors_cal": 8289,
+    "errors_test": 8480,
+    "unmatched_cal": 0,
+    "unmatched_test": 0,
+    "maccp": {
+      "llm_agree_xgb_disagree_alpha0.05": {
+        "overall": {
+          "description": "MACCP overall",
+          "coverage": 0.9293632075471698,
+          "mean_set_size": 15.27122641509434,
+          "median_set_size": 15.0,
+          "singleton_rate": 0.0,
+          "singleton_accuracy": 0.0,
+          "n": 8480,
+          "q_agree": 0.9807552695274353,
+          "q_disagree": 1.0283268690109253,
+          "n_cal_agree": 2273,
+          "n_cal_disagree": 6016,
+          "n_test_agree": 2276,
+          "n_test_disagree": 6204,
+          "alpha": 0.05
+        },
+        "agree": {
+          "description": "MACCP agree",
+          "coverage": 0.9490333919156415,
+          "mean_set_size": 18.0,
+          "median_set_size": 18.0,
+          "singleton_rate": 0.0,
+          "singleton_accuracy": 0.0,
+          "n": 2276
+        },
+        "disagree": {
+          "description": "MACCP disagree",
+          "coverage": 0.9221470019342359,
+          "mean_set_size": 14.270148291424887,
+          "median_set_size": 15.0,
+          "singleton_rate": 0.0,
+          "singleton_accuracy": 0.0,
+          "n": 6204
+        }
+      },
+      "llm_agree_xgb_disagree_alpha0.1": {
+        "overall": {
+          "description": "MACCP overall",
+          "coverage": 0.9033018867924528,
+          "mean_set_size": 13.578419811320755,
+          "median_set_size": 14.0,
+          "singleton_rate": 0.0012971698113207546,
+          "singleton_accuracy": 0.8181818181818182,
+          "n": 8480,
+          "q_agree": 0.9189331531524658,
+          "q_disagree": 0.9786445498466492,
+          "n_cal_agree": 2273,
+          "n_cal_disagree": 6016,
+          "n_test_agree": 2276,
+          "n_test_disagree": 6204,
+          "alpha": 0.1
+        },
+        "agree": {
+          "description": "MACCP agree",
+          "coverage": 0.9459578207381371,
+          "mean_set_size": 17.0,
+          "median_set_size": 17.0,
+          "singleton_rate": 0.0,
+          "singleton_accuracy": 0.0,
+          "n": 2276
+        },
+        "disagree": {
+          "description": "MACCP disagree",
+          "coverage": 0.8876531270148291,
+          "mean_set_size": 12.32317859445519,
+          "median_set_size": 13.0,
+          "singleton_rate": 0.0017730496453900709,
+          "singleton_accuracy": 0.8181818181818182,
+          "n": 6204
+        }
+      },
+      "llm_agree_xgb_disagree_alpha0.2": {
+        "overall": {
+          "description": "MACCP overall",
+          "coverage": 0.8122641509433962,
+          "mean_set_size": 10.652712264150944,
+          "median_set_size": 11.0,
+          "singleton_rate": 0.029716981132075472,
+          "singleton_accuracy": 0.8492063492063492,
+          "n": 8480,
+          "q_agree": 0.8142691850662231,
+          "q_disagree": 0.8718892931938171,
+          "n_cal_agree": 2273,
+          "n_cal_disagree": 6016,
+          "n_test_agree": 2276,
+          "n_test_disagree": 6204,
+          "alpha": 0.2
+        },
+        "agree": {
+          "description": "MACCP agree",
+          "coverage": 0.8501757469244289,
+          "mean_set_size": 15.0,
+          "median_set_size": 15.0,
+          "singleton_rate": 0.0,
+          "singleton_accuracy": 0.0,
+          "n": 2276
+        },
+        "disagree": {
+          "description": "MACCP disagree",
+          "coverage": 0.7983558994197292,
+          "mean_set_size": 9.057865892972275,
+          "median_set_size": 10.0,
+          "singleton_rate": 0.04061895551257253,
+          "singleton_accuracy": 0.8492063492063492,
+          "n": 6204
+        }
+      }
+    }
+  }
+}

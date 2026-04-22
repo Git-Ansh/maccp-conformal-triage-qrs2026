@@ -1,0 +1,16 @@
+{
+  "experiments_found": [
+    "hybrid"
+  ],
+  "model_accuracies": {
+    "DeBERTa-base": {
+      "eclipse": 0.5447272442056551
+    },
+    "XGBoost": {
+      "eclipse": 0.6606533589552531
+    },
+    "Majority baseline": {
+      "eclipse": 0.19777246166516335
+    }
+  }
+}

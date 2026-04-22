@@ -1,0 +1,294 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Mozila dataset project ideas}
+\author{ Naser Ezzati-Jivan }
+\date{November 2025}
+
+\begin{document}
+\maketitle
+\section{Phase 1: Regression vs.\ Noise Classification}
+\label{sec:phase1}
+
+\subsection{Goal and Motivation}
+The goal of Phase 1 is to build an initial supervised learning model that predicts whether a Mozilla performance alert corresponds to a true regression or to noise. This phase is designed as the entry point for the student. It requires basic data science skills and produces a useful baseline for the later phases. The Mozilla dataset is ideal for this step because it already contains regression labels and rich alert-level metadata. A strong Phase 1 outcome is a model that reduces false positives relative to Perfherder's current rule-based alerts, while remaining interpretable.
+
+From a research perspective, Phase 1 answers a simple but important question: can alert metadata alone separate meaningful regressions from noisy fluctuations in large-scale continuous integration testing. If this is successful, later phases can add time-series features and more advanced detection models.
+\subsection{Objectives and Research Questions}
+
+The first phase of the project focuses on understanding whether alert-level metadata is sufficient to distinguish true performance regressions from noise in Mozilla’s continuous integration environment. The objectives combine practical goals, such as building an effective baseline classifier, with scientific goals, such as determining which features carry the most predictive power. The phase also provides a foundation for later work by establishing a reproducible methodology for data preparation, modeling, and evaluation.
+
+\subsubsection{Main Objective}
+The primary objective of Phase~1 is to develop a supervised learning model that predicts whether an alert corresponds to a true regression using only the information provided in \texttt{alerts\_data.csv}. The goal is to determine whether readily available metadata signals, such as magnitude of change, test suite information, and platform characteristics, allow us to identify regressions with higher precision than the current threshold-based methods used in Perfherder.
+
+\subsubsection{Sub-Objectives}
+To support the main objective, Phase~1 has the following sub-objectives:
+\begin{itemize}
+    \item Prepare and clean the alert dataset by selecting features, encoding categorical variables, and handling missing values without introducing label leakage.
+    \item Train and evaluate several baseline machine learning models, beginning with Logistic Regression and extending to Random Forest and Gradient Boosting.
+    \item Identify the most influential features and feature types through permutation importance or SHAP analysis.
+    \item Evaluate cross-repository generalization by training on a subset of repositories and testing on a held-out repository.
+    \item Conduct ablation studies to measure the contribution of magnitude-based features, context-based features, and workflow-based features.
+\end{itemize}
+
+\subsubsection{Research Questions}
+The following research questions guide Phase~1:
+\begin{itemize}
+    \item \textbf{RQ1:} Are alert-level metadata features sufficient to distinguish true regressions from noisy alerts in Mozilla’s performance testing environment?
+    \item \textbf{RQ2:} Which alert metadata features contribute the most to the accurate identification of regressions?
+    \item \textbf{RQ3:} Does a supervised learning model achieve higher precision or lower false-positive rates than Perfherder’s existing rule-based heuristics?
+    \item \textbf{RQ4:} How well do models trained on alerts from certain repositories or platforms generalize to previously unseen repositories or platforms?
+    \item \textbf{RQ5:} Do magnitude-based signals (such as percent change and t-value) dominate predictive performance, or do contextual features (such as platform or suite) also provide significant value?
+\end{itemize}
+
+Together, these objectives and research questions define the scope of Phase~1 and clarify the expected outcomes. They also motivate the design of the experiments described later, ensuring that the results contribute to a broader understanding of regression detection in large-scale continuous integration systems.
+
+\subsection{Data Used}
+Phase 1 uses only the curated alert file:
+\begin{itemize}
+    \item \textbf{\texttt{data/alerts\_data.csv}}: each row represents a single alert detected in Perfherder, along with properties of the alert, its signature, and its associated alert summary.
+\end{itemize}
+
+The target label is:
+\begin{itemize}
+    \item \textbf{\texttt{single\_alert\_is\_regression}}: Boolean label produced by Mozilla. In Phase 1 we treat \texttt{True} as \emph{regression} and \texttt{False} as \emph{noise or improvement}.
+\end{itemize}
+
+Phase 1 does \emph{not} depend on raw time series or bug reports. Those are used in later phases.
+
+\subsection{Problem Definition}
+We define a binary classification problem:
+\begin{equation}
+    f(\mathbf{x}) \rightarrow y,\ \ \ y \in \{0,1\}
+\end{equation}
+where $\mathbf{x}$ is a vector of alert-level features derived from \texttt{alerts\_data.csv}, and $y=1$ indicates regression.
+
+\subsection{Feature Set}
+We divide the Phase 1 features into three groups. This grouping helps interpret which type of signal is most useful.
+
+\paragraph{Magnitude and statistical signals (numeric).}
+These features capture how strong the alert appears to be:
+\begin{itemize}
+    \item \texttt{single\_alert\_amount\_abs}
+    \item \texttt{single\_alert\_amount\_pct}
+    \item \texttt{single\_alert\_t\_value}
+    \item \texttt{single\_alert\_prev\_value}
+    \item \texttt{single\_alert\_new\_value}
+\end{itemize}
+
+\paragraph{Test and platform context (categorical).}
+These features capture where the alert came from:
+\begin{itemize}
+    \item \texttt{repository\_name} or \texttt{repository\_id}
+    \item \texttt{framework\_id}
+    \item \texttt{machine\_platform}
+    \item \texttt{single\_alert\_series\_signature\_suite}
+    \item \texttt{single\_alert\_series\_signature\_tags} (if available)
+    \item \texttt{lower\_is\_better} (if present in alerts file)
+\end{itemize}
+
+\paragraph{Workflow hints (categorical or numeric).}
+These features describe how the alert behaved inside Mozilla's workflow:
+\begin{itemize}
+    \item \texttt{single\_alert\_manually\_created}
+    \item \texttt{single\_alert\_status}
+    \item \texttt{alert\_summary\_status}
+\end{itemize}
+For Phase 1, we include these features only if they are recorded at alert creation time. If a feature reflects a later decision, it must be excluded to avoid label leakage. The student should confirm this by checking timestamps.
+
+\subsection{Implementation Steps}
+
+\paragraph{Step 1: Load and inspect the alerts data.}
+\begin{itemize}
+    \item Load \texttt{alerts\_data.csv} using pandas.
+    \item Print the number of alerts, number of unique signatures, and class distribution.
+\end{itemize}
+
+Example python snippet:
+\begin{verbatim}
+import pandas as pd
+
+alerts = pd.read_csv("data/alerts_data.csv")
+print(alerts.shape)
+print(alerts["single_alert_is_regression"].value_counts(dropna=False))
+\end{verbatim}
+
+\paragraph{Step 2: Label cleaning.}
+\begin{itemize}
+    \item Remove rows where \texttt{single\_alert\_is\_regression} is missing.
+    \item Map labels to integers: regression $=1$, else $=0$.
+\end{itemize}
+
+\paragraph{Step 3: Feature selection and leakage check.}
+\begin{itemize}
+    \item Start with the feature groups listed above.
+    \item Remove columns that are clearly identifiers or post-triage decisions.
+    \item Remove columns with nearly all missing values.
+\end{itemize}
+
+A practical rule: any column that uses terms like \texttt{triaged}, \texttt{fixed}, or \texttt{backedout} after the alert timestamp should not be used as input in Phase 1.
+
+\paragraph{Step 4: Handle missing values.}
+\begin{itemize}
+    \item For numeric features, fill missing values using median imputation.
+    \item For categorical features, fill missing values using \texttt{"Unknown"}.
+\end{itemize}
+
+Example:
+\begin{verbatim}
+num_cols = ["single_alert_amount_abs",
+            "single_alert_amount_pct",
+            "single_alert_t_value",
+            "single_alert_prev_value",
+            "single_alert_new_value"]
+
+cat_cols = ["framework_id",
+            "machine_platform",
+            "single_alert_series_signature_suite",
+            "repository_name"]
+
+alerts[num_cols] = alerts[num_cols].fillna(alerts[num_cols].median())
+alerts[cat_cols] = alerts[cat_cols].fillna("Unknown")
+\end{verbatim}
+
+\paragraph{Step 5: Encode categorical variables.}
+Two safe beginner-level options:
+\begin{itemize}
+    \item \textbf{One-hot encoding} for low-cardinality features such as framework and repository.
+    \item \textbf{Frequency encoding} for high-cardinality features such as suite if needed.
+\end{itemize}
+
+If suite has hundreds of values, frequency encoding avoids an extremely wide feature matrix.
+
+\paragraph{Step 6: Train, validation, and test split.}
+\begin{itemize}
+    \item Random split 70\% train, 15\% validation, 15\% test.
+    \item Use stratification to preserve the regression ratio.
+\end{itemize}
+
+Example:
+\begin{verbatim}
+from sklearn.model_selection import train_test_split
+
+X = alerts[features]
+y = alerts["single_alert_is_regression"].astype(int)
+
+X_train, X_temp, y_train, y_temp = train_test_split(
+    X, y, test_size=0.30, stratify=y, random_state=42)
+
+X_val, X_test, y_val, y_test = train_test_split(
+    X_temp, y_temp, test_size=0.50, stratify=y_temp, random_state=42)
+\end{verbatim}
+
+\paragraph{Step 7: Baseline models.}
+Train a small set of interpretable baselines:
+\begin{itemize}
+    \item Logistic Regression
+    \item Random Forest
+    \item Gradient Boosting (XGBoost or LightGBM if available)
+\end{itemize}
+
+The student should start with Logistic Regression to learn the full pipeline, then move to tree models.
+
+\paragraph{Step 8: Hyperparameter tuning.}
+Use simple grid search on the validation set:
+\begin{itemize}
+    \item Random Forest: number of trees, max depth, minimum leaf size.
+    \item Gradient Boosting: number of estimators, learning rate, depth.
+\end{itemize}
+
+\paragraph{Step 9: Evaluation.}
+Compute metrics on the test set:
+\begin{itemize}
+    \item Accuracy
+    \item Precision and recall for the regression class
+    \item F1-score
+    \item ROC-AUC
+\end{itemize}
+
+Precision matters because false positives waste triage effort. Recall matters because missing a real regression is costly.
+
+\subsection{Experimental Design}
+
+\paragraph{Experiment E1: Alert metadata classifier.}
+This is the main experiment. Input features are alert-level metadata only. The target is \texttt{single\_alert\_is\_regression}. Models are Logistic Regression, Random Forest, and Gradient Boosting. The evaluation uses the metrics listed above.
+
+\paragraph{Experiment E2: Cross-repository generalization.}
+To test whether the model learns real patterns instead of repository-specific quirks:
+\begin{itemize}
+    \item Train on a subset of repositories, such as autoland1 through autoland3.
+    \item Test on a held-out repository such as mozilla-central or mozilla-beta.
+\end{itemize}
+This requires filtering the alerts by \texttt{repository\_name}.
+
+\paragraph{Experiment E3: Feature ablation.}
+Measure the contribution of each feature group:
+\begin{itemize}
+    \item Only magnitude features.
+    \item Only context features.
+    \item Magnitude plus context.
+    \item All features.
+\end{itemize}
+
+This shows whether metadata provides value beyond pure magnitude thresholds.
+
+\subsection{Concrete Examples of Alerts}
+
+\paragraph{Example 1: High-magnitude clear regression.}
+An alert with:
+\begin{itemize}
+    \item high \texttt{single\_alert\_amount\_pct} (for example above 5\%),
+    \item high \texttt{single\_alert\_t\_value},
+    \item stable suite history on a low-noise platform.
+\end{itemize}
+Such cases should be easy for both Perfherder and ML to classify as regression.
+
+\paragraph{Example 2: Noisy test false positive.}
+An alert with:
+\begin{itemize}
+    \item moderate change magnitude,
+    \item low t-value,
+    \item suite or platform known to be unstable,
+    \item historically high variance in similar alerts.
+\end{itemize}
+These are typical ``Invalid'' regressions. A good model should learn to label many of them as noise.
+
+\paragraph{Example 3: Downstream alert.}
+An alert that appears shortly after another alert within the same summary, often with smaller magnitude. These alerts are frequently labeled ``Downstream.'' Even without time-series features, metadata such as summary linkage and suite patterns may help the model reduce false positives.
+
+\subsection{Expected Outcomes}
+Phase 1 is expected to produce:
+\begin{itemize}
+    \item A reproducible alert classification pipeline.
+    \item A baseline classifier that achieves better precision than Perfherder heuristics.
+    \item A ranked list of the most important metadata features.
+    \item Initial evidence on whether alert context is critical for regression detection.
+\end{itemize}
+
+\subsection{Reproducibility and Reporting}
+All experiments will be performed using fixed random seeds and saved configuration files. The student will provide:
+\begin{itemize}
+    \item data preprocessing scripts,
+    \item model training notebooks,
+    \item evaluation plots and tables,
+    \item a short technical report summarizing findings.
+\end{itemize}
+
+\subsection{Risks and Mitigations}
+\begin{itemize}
+    \item \textbf{Class imbalance.} If regressions are rare, apply class weights or SMOTE on the training set.
+    \item \textbf{High-cardinality categories.} Use frequency encoding or group rare suites into an ``Other'' bucket.
+    \item \textbf{Label noise.} Cross-check with \texttt{alert\_summary\_status} for a sensitivity analysis, while avoiding leakage.
+\end{itemize}
+
+\subsection{Phase 1 Deliverables}
+At the end of Phase 1 the student will deliver:
+\begin{itemize}
+    \item A cleaned feature table derived from \texttt{alerts\_data.csv}.
+    \item Baseline regression classifiers with tuned parameters.
+    \item A full evaluation report including ablations and generalization tests.
+    \item A written summary of insights that motivate Phase 2 and Phase 3.
+\end{itemize}
+
+
+\end{document}

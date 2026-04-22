@@ -1,0 +1,169 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Mozila dataset project (ansh and deep patel)}
+\author{ Naser Ezzati-Jivan }
+
+\date{December 2025}
+
+\begin{document}
+
+\maketitle
+\section{Phase 6: Automated Root Cause Analysis}
+\label{sec:phase6}
+
+\subsection{Goal and Motivation}
+Phase 6 integrates all results from the previous phases to explore automated root cause analysis (RCA). Root cause analysis is a central task in Mozilla’s performance triage process, where engineers analyze regressions, consult bug reports, and identify the subsystem, test, or component responsible for a performance issue. Mozilla’s dataset provides metadata, limited textual descriptions, alert relations, and bug information that can be used to infer likely root causes or cluster related alerts.
+
+This phase requires advanced methods and represents the most open-ended and research-driven component of the project. The goal is to explore whether automated techniques can aid or partially automate triage by identifying patterns that indicate why a regression occurred.
+
+\subsection{Objectives and Research Questions}
+
+\subsubsection{Main Objective}
+The main objective of Phase~6 is to design and evaluate methods that infer, group, or predict potential root causes using alert metadata, time-series signals, and bug report information.
+
+\subsubsection{Sub-Objectives}
+\begin{itemize}
+    \item Cluster alerts based on combined metadata and time-series feature vectors to identify groups of related regressions.
+    \item Predict which alerts are likely to result in bug reports using supervised learning.
+    \item Apply text mining or simple NLP on alert notes and bug summaries to extract root-cause categories.
+    \item Investigate whether alert linkages (for example downstream alerts) help identify primary regressions.
+    \item Evaluate how well automated methods match or approximate Mozilla engineer decisions.
+\end{itemize}
+
+\subsubsection{Research Questions}
+\begin{itemize}
+    \item \textbf{RQ1:} Can we automatically group alerts that share the same root cause based on metadata and time-series behavior?
+    \item \textbf{RQ2:} Which features (time-series variability, alert status, workflow features) help predict whether an alert will lead to a bug report?
+    \item \textbf{RQ3:} Can textual information in bug summaries or alert notes reveal categories of regressions?
+    \item \textbf{RQ4:} Do downstream alerts form coherent clusters that identify primary root causes?
+    \item \textbf{RQ5:} How accurate are automated RCA predictions compared with Mozilla’s actual triage records?
+\end{itemize}
+
+\subsection{Data Used}
+Phase 6 integrates all previously used data sources:
+\begin{itemize}
+    \item \textbf{\texttt{alerts\_data.csv}}: contains statuses, assignees, summary links.
+    \item \textbf{\texttt{timeseries\_data/\*/\*.csv}}: provides performance behavior.
+    \item \textbf{\texttt{bugs\_data.csv}}: includes bug summaries, components, creators, timestamps.
+\end{itemize}
+
+\subsection{Possible RCA Tasks}
+
+\paragraph{Task 1: Alert Clustering.}
+Use clustering algorithms (K-Means, DBSCAN, HDBSCAN) on engineered features to identify regression clusters. Compare clusters with shared bug IDs, platforms, or suites.
+
+\paragraph{Task 2: Bug Prediction.}
+Define a binary label:
+\[
+y = \begin{cases}
+1 & \text{if alert leads to a bug report} \\
+0 & \text{otherwise}
+\end{cases}
+\]
+Train classifiers (Gradient Boosting, Random Forest) to predict which alerts require filing a bug.
+
+\paragraph{Task 3: Root-Cause Category Extraction.}
+Use text-based methods:
+\begin{itemize}
+    \item TF–IDF feature extraction,
+    \item clustering on summary texts,
+    \item keyword extraction (for example ``memory'', ``graphics'', ``I/O'', ``network'').
+\end{itemize}
+
+\paragraph{Task 4: Downstream Analysis.}
+Downstream alerts may share root causes with the primary alert. Evaluate whether graph-based grouping of alerts within the same summary leads to coherent clusters.
+
+\subsection{Implementation Steps}
+
+\paragraph{Step 1: Feature preparation.}
+Combine metadata and time-series features from Phases 1–3 into a unified vector.
+
+\paragraph{Step 2: Construct RCA labels.}
+Construct labels such as:
+\begin{itemize}
+    \item bug existence,
+    \item bug component,
+    \item alert summary ID,
+    \item downstream versus primary alert.
+\end{itemize}
+
+\paragraph{Step 3: Perform clustering.}
+Run clustering algorithms on the unified feature space. Evaluate cluster purity relative to bug IDs or components.
+
+\paragraph{Step 4: Perform bug prediction.}
+Train and evaluate supervised classifiers.
+
+\paragraph{Step 5: Text analysis.}
+Apply TF–IDF or simple Transformers (optional) to bug summaries and alert notes. Extract key phrases and categories.
+
+\paragraph{Step 6: Evaluate RCA quality.}
+Measure:
+\begin{itemize}
+    \item cluster homogeneity,
+    \item cluster completeness,
+    \item classification accuracy for bug prediction,
+    \item text-topic coherence.
+\end{itemize}
+
+\subsection{Experimental Design}
+
+\paragraph{Experiment E1: Metadata + time-series clustering.}
+Evaluate whether alerts with the same root cause form coherent clusters.
+
+\paragraph{Experiment E2: Predictive models for bug filing.}
+Train classifiers to predict which alerts lead to reported bugs.
+
+\paragraph{Experiment E3: Text-derived root-cause categories.}
+Extract topics and keywords from bug summaries. Compare with known components.
+
+\paragraph{Experiment E4: Downstream vs.\ primary alert analysis.}
+Determine whether downstream alerts can be connected back to their primary cause.
+
+\subsection{Concrete Examples}
+
+\paragraph{Example 1: Memory-related regressions.}
+Bug summaries mention ``memory usage'' or ``leak''. Alerts cluster based on increased variance.
+
+\paragraph{Example 2: Graphics regressions.}
+Alerts from rendering or layout tests may cluster together.
+
+\paragraph{Example 3: Regression chains.}
+Downstream alerts share metadata and time-series features with the primary alert.
+
+\subsection{Expected Outcomes}
+\begin{itemize}
+    \item A multi-task RCA module integrating clustering, prediction, and text analysis.
+    \item Evidence on whether automated RCA is feasible using Mozilla’s dataset.
+    \item A list of dominant regression categories extracted from bug data.
+    \item Insights into alert linkages and relationships.
+\end{itemize}
+
+\subsection{Reproducibility and Reporting}
+The student will produce:
+\begin{itemize}
+    \item unified feature matrices,
+    \item clustering scripts,
+    \item bug-prediction experiments,
+    \item text-analysis tools,
+    \item a comprehensive RCA report.
+\end{itemize}
+
+\subsection{Risks and Mitigations}
+\begin{itemize}
+    \item \textbf{Sparse textual data:} bug summaries may be short; simple TF–IDF works better than deep NLP.
+    \item \textbf{Label ambiguity:} some alerts may not map cleanly to a single root cause.
+    \item \textbf{High-dimensional feature space:} apply PCA or UMAP before clustering.
+\end{itemize}
+
+\subsection{Phase 6 Deliverables}
+\begin{itemize}
+    \item Automated RCA tools (clustering, bug prediction, text analysis).
+    \item Evaluation of RCA accuracy and usability.
+    \item Case studies demonstrating successful RCA predictions.
+    \item A final report integrating insights from all previous phases.
+\end{itemize}
+
+
+
+\end{document}

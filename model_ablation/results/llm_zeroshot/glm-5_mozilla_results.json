@@ -1,0 +1,126 @@
+{
+  "model": "glm-5",
+  "dataset": "mozilla",
+  "cal_accuracy": 0.0,
+  "test_accuracy": 0.0,
+  "cal_valid_rate": 0.0,
+  "test_valid_rate": 0.0,
+  "cal_agreement_with_xgb": 0.0,
+  "test_agreement_with_xgb": 0.0,
+  "n_cal": 8289,
+  "n_test": 8480,
+  "errors_cal": 8289,
+  "errors_test": 8480,
+  "unmatched_cal": 0,
+  "unmatched_test": 0,
+  "maccp": {
+    "llm_agree_xgb_disagree_alpha0.05": {
+      "overall": {
+        "description": "MACCP overall",
+        "coverage": 0.9293632075471698,
+        "mean_set_size": 15.27122641509434,
+        "median_set_size": 15.0,
+        "singleton_rate": 0.0,
+        "singleton_accuracy": 0.0,
+        "n": 8480,
+        "q_agree": 0.9807552695274353,
+        "q_disagree": 1.0283268690109253,
+        "n_cal_agree": 2273,
+        "n_cal_disagree": 6016,
+        "n_test_agree": 2276,
+        "n_test_disagree": 6204,
+        "alpha": 0.05
+      },
+      "agree": {
+        "description": "MACCP agree",
+        "coverage": 0.9490333919156415,
+        "mean_set_size": 18.0,
+        "median_set_size": 18.0,
+        "singleton_rate": 0.0,
+        "singleton_accuracy": 0.0,
+        "n": 2276
+      },
+      "disagree": {
+        "description": "MACCP disagree",
+        "coverage": 0.9221470019342359,
+        "mean_set_size": 14.270148291424887,
+        "median_set_size": 15.0,
+        "singleton_rate": 0.0,
+        "singleton_accuracy": 0.0,
+        "n": 6204
+      }
+    },
+    "llm_agree_xgb_disagree_alpha0.1": {
+      "overall": {
+        "description": "MACCP overall",
+        "coverage": 0.9033018867924528,
+        "mean_set_size": 13.578419811320755,
+        "median_set_size": 14.0,
+        "singleton_rate": 0.0012971698113207546,
+        "singleton_accuracy": 0.8181818181818182,
+        "n": 8480,
+        "q_agree": 0.9189331531524658,
+        "q_disagree": 0.9786445498466492,
+        "n_cal_agree": 2273,
+        "n_cal_disagree": 6016,
+        "n_test_agree": 2276,
+        "n_test_disagree": 6204,
+        "alpha": 0.1
+      },
+      "agree": {
+        "description": "MACCP agree",
+        "coverage": 0.9459578207381371,
+        "mean_set_size": 17.0,
+        "median_set_size": 17.0,
+        "singleton_rate": 0.0,
+        "singleton_accuracy": 0.0,
+        "n": 2276
+      },
+      "disagree": {
+        "description": "MACCP disagree",
+        "coverage": 0.8876531270148291,
+        "mean_set_size": 12.32317859445519,
+        "median_set_size": 13.0,
+        "singleton_rate": 0.0017730496453900709,
+        "singleton_accuracy": 0.8181818181818182,
+        "n": 6204
+      }
+    },
+    "llm_agree_xgb_disagree_alpha0.2": {
+      "overall": {
+        "description": "MACCP overall",
+        "coverage": 0.8122641509433962,
+        "mean_set_size": 10.652712264150944,
+        "median_set_size": 11.0,
+        "singleton_rate": 0.029716981132075472,
+        "singleton_accuracy": 0.8492063492063492,
+        "n": 8480,
+        "q_agree": 0.8142691850662231,
+        "q_disagree": 0.8718892931938171,
+        "n_cal_agree": 2273,
+        "n_cal_disagree": 6016,
+        "n_test_agree": 2276,
+        "n_test_disagree": 6204,
+        "alpha": 0.2
+      },
+      "agree": {
+        "description": "MACCP agree",
+        "coverage": 0.8501757469244289,
+        "mean_set_size": 15.0,
+        "median_set_size": 15.0,
+        "singleton_rate": 0.0,
+        "singleton_accuracy": 0.0,
+        "n": 2276
+      },
+      "disagree": {
+        "description": "MACCP disagree",
+        "coverage": 0.7983558994197292,
+        "mean_set_size": 9.057865892972275,
+        "median_set_size": 10.0,
+        "singleton_rate": 0.04061895551257253,
+        "singleton_accuracy": 0.8492063492063492,
+        "n": 6204
+      }
+    }
+  }
+}

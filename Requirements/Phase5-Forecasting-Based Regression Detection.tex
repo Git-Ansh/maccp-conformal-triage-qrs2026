@@ -1,0 +1,185 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Mozila dataset project (ansh and deep patel)}
+\author{ Naser Ezzati-Jivan }
+
+\date{December 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Phase 5: Forecasting-Based Regression Detection}
+\label{sec:phase5}
+
+\subsection{Goal and Motivation}
+Phase 5 explores forecasting-based regression detection by modeling expected performance behavior and identifying anomalies through forecast errors. The key idea is that if a forecasting model can accurately predict future measurements of a performance test, then a significant deviation between predicted and actual values may indicate a regression event. This approach complements the change-point detection methods in Phase 4 by explicitly modeling temporal dynamics rather than looking only for statistical irregularities.
+
+Forecast-based detection is widely used in anomaly detection for operational systems (for example workload forecasting or resource usage monitoring). Applying these principles to Mozilla’s CI performance data helps determine whether predictive models can detect regressions earlier or more reliably than rule-based or classical statistical methods.
+
+\subsection{Objectives and Research Questions}
+
+\subsubsection{Main Objective}
+The main objective of Phase~5 is to train forecasting models on pre-alert performance measurements and evaluate whether deviations between predicted and observed values correspond to actual regressions.
+
+\subsubsection{Sub-Objectives}
+\begin{itemize}
+    \item Fit forecasting models to time-series windows before each alert.
+    \item Predict near-future measurements and compute residuals (prediction errors).
+    \item Detect anomalies using thresholding, statistical rules, and residual modeling.
+    \item Compare forecast-based detection accuracy to Mozilla’s regression labels.
+    \item Analyze forecasting accuracy across tests, platforms, and repositories.
+    \item Study which forecasting methods are most robust in noisy CI environments.
+\end{itemize}
+
+\subsubsection{Research Questions}
+\begin{itemize}
+    \item \textbf{RQ1:} Can forecasting-based methods reliably detect regressions in Mozilla’s performance data?
+    \item \textbf{RQ2:} Which forecasting models are most effective for short-horizon CI predictions?
+    \item \textbf{RQ3:} How sensitive is forecast accuracy to window size, noise level, and seasonality?
+    \item \textbf{RQ4:} Are forecast residuals a stronger indicator of regressions than metadata-driven signals?
+    \item \textbf{RQ5:} How well do forecasting-based detectors generalize across suites, platforms, and repositories?
+\end{itemize}
+
+\subsection{Data Used}
+Phase 5 uses:
+\begin{itemize}
+    \item \textbf{\texttt{data/timeseries\_data/\*/\*.csv}}: raw performance measurements.
+    \item \textbf{\texttt{alerts\_data.csv}}: regression labels serve as ground truth.
+\end{itemize}
+
+For each alert, time-series windows preceding the alert index are used to train forecasts.
+
+\subsection{Problem Definition}
+Given a time series:
+\begin{equation}
+    \mathbf{s} = (s_{1}, s_{2}, \dots, s_{t})
+\end{equation}
+we train a forecasting model $h$ that predicts:
+\begin{equation}
+    \hat{s}_{t+1}, \hat{s}_{t+2}, \dots
+\end{equation}
+
+The residual errors:
+\begin{equation}
+    e_{t+k} = |s_{t+k} - \hat{s}_{t+k}|
+\end{equation}
+are used to determine whether a regression occurred.
+
+\subsection{Models Evaluated}
+
+\paragraph{Statistical Forecasting Methods.}
+\begin{itemize}
+    \item ARIMA (AutoRegressive Integrated Moving Average)
+    \item Holt–Winters exponential smoothing
+\end{itemize}
+
+\paragraph{Machine Learning Forecasting Methods.}
+\begin{itemize}
+    \item Prophet (trend + seasonality modeling)
+    \item Random Forest regression on lagged features
+\end{itemize}
+
+\paragraph{Neural Forecasting Methods (optional).}
+\begin{itemize}
+    \item LSTM (Long Short-Term Memory)
+    \item GRU-based models
+\end{itemize}
+
+Neural methods are optional and can be included depending on student skill and time.
+
+\subsection{Implementation Steps}
+
+\paragraph{Step 1: Align time series with regression alerts.}
+Extract windows of $W$ points before each alert index.
+
+\paragraph{Step 2: Preprocess the time series.}
+\begin{itemize}
+    \item normalize or standardize values,
+    \item optionally apply smoothing,
+    \item remove repeated identical values caused by system-level caching.
+\end{itemize}
+
+\paragraph{Step 3: Train forecasting models.}
+Models are trained only on points $1 \dots t$ and must not use future data.
+
+\paragraph{Step 4: Predict future points.}
+Predict $k$ points ahead (for example $k=1,2,3$) after the alert.
+
+\paragraph{Step 5: Compute residuals and detection scores.}
+Detection rules may include:
+\begin{itemize}
+    \item residual thresholding: $e_{t+1} > \tau$,
+    \item z-score based anomaly detection,
+    \item change in forecast variance,
+    \item prediction interval violations.
+\end{itemize}
+
+\paragraph{Step 6: Compare to ground truth.}
+Identify whether large residuals correspond to actual regressions.
+
+\subsection{Experimental Design}
+
+\paragraph{Experiment E1: Forecast-based detection vs.\ ground truth.}
+Evaluate whether forecast errors correlate with true regressions.
+
+\paragraph{Experiment E2: Comparison of forecasting models.}
+Compare ARIMA, Holt–Winters, Prophet, and ML models.
+
+\paragraph{Experiment E3: Effect of window size.}
+Evaluate models using different pre-alert windows (for example W=20, 40, 60).
+
+\paragraph{Experiment E4: Repository-level generalization.}
+Test forecast-based detection across repositories and platforms.
+
+\paragraph{Experiment E5: Residual modeling.}
+Use supervised methods to classify residual patterns.
+
+\subsection{Concrete Examples}
+
+\paragraph{Example 1: Predictable stable behavior.}
+If a test is stable, forecasting models perform well until a regression causes an abrupt deviation.
+
+\paragraph{Example 2: Noisy test with poor forecasting accuracy.}
+In highly unstable suites, forecast residuals may be unreliable.
+
+\paragraph{Example 3: Slow drift.}
+Forecast models may adapt gradually and fail to trigger alerts.
+
+\subsection{Expected Outcomes}
+\begin{itemize}
+    \item A comparative study of forecasting models on CI performance data.
+    \item Evidence showing whether forecasting-based detection is viable for Mozilla.
+    \item A reusable forecasting module for later experiments.
+    \item Quantitative plots of predicted vs.\ observed values.
+\end{itemize}
+
+\subsection{Reproducibility and Reporting}
+The student will document:
+\begin{itemize}
+    \item preprocessing steps,
+    \item hyperparameters for all models,
+    \item evaluation scripts,
+    \item complete accuracy and correlation tables.
+\end{itemize}
+
+\subsection{Risks and Mitigations}
+\begin{itemize}
+    \item \textbf{Unstable performance characteristics:} use robust models such as Prophet.
+    \item \textbf{Short time series:} apply simpler models like ARIMA or Holt–Winters.
+    \item \textbf{Overfitting:} use cross-validation on multiple signature files.
+\end{itemize}
+
+\subsection{Phase 5 Deliverables}
+\begin{itemize}
+    \item A forecasting-based regression detector.
+    \item Comparison of forecast residuals and known regression labels.
+    \item Figures illustrating prediction errors around regression points.
+    \item A technical report summarizing strengths and weaknesses.
+\end{itemize}
+
+
+
+
+\end{document}

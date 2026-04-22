@@ -1,0 +1,129 @@
+{
+  "maccp": {
+    "overall": {
+      "n": 25499,
+      "coverage": 0.898623475430409,
+      "mean_set": 5.610220008627789,
+      "singleton_rate": 0.2869132122828346,
+      "singleton_acc": 0.8993985784581738
+    },
+    "groups": {
+      "0": {
+        "n": 13586,
+        "coverage": 0.8842190490210511,
+        "mean_set": 8.515309877815397,
+        "median_set": 8.0,
+        "singleton_rate": 0.0014721036360959812,
+        "singleton_acc": 0.65
+      },
+      "1": {
+        "n": 11913,
+        "coverage": 0.9150507848568791,
+        "mean_set": 2.2971543691765297,
+        "median_set": 1.0,
+        "singleton_rate": 0.6124401913875598,
+        "singleton_acc": 0.9000822368421053
+      }
+    },
+    "best_group_sing": 0.6124401913875598
+  },
+  "confidence_mondrian": {
+    "overall": {
+      "n": 25499,
+      "coverage": 0.8732107141456528,
+      "mean_set": 5.259461155339425,
+      "singleton_rate": 0.2323228361896545,
+      "singleton_acc": 0.8479068197164078
+    },
+    "groups": {
+      "[0.0,0.3)": {
+        "n": 1341,
+        "coverage": 0.8933631618195377,
+        "mean_set": 11.042505592841163,
+        "median_set": 11.0,
+        "singleton_rate": 0.0,
+        "singleton_acc": 0.0
+      },
+      "[0.3,0.5)": {
+        "n": 3910,
+        "coverage": 0.8831202046035805,
+        "mean_set": 8.758056265984655,
+        "median_set": 9.0,
+        "singleton_rate": 0.0,
+        "singleton_acc": 0.0
+      },
+      "[0.5,0.7)": {
+        "n": 4172,
+        "coverage": 0.8933365292425696,
+        "mean_set": 7.87967401725791,
+        "median_set": 8.0,
+        "singleton_rate": 0.0,
+        "singleton_acc": 0.0
+      },
+      "[0.7,1.0)": {
+        "n": 16076,
+        "coverage": 0.8638964916645931,
+        "mean_set": 3.2461433192336404,
+        "median_set": 2.0,
+        "singleton_rate": 0.36849962677282905,
+        "singleton_acc": 0.8479068197164078
+      }
+    },
+    "best_group_sing": 0.36849962677282905
+  },
+  "class_conditional": {
+    "overall": {
+      "n": 25499,
+      "coverage": 0.8788579944311542,
+      "mean_set": 5.372798933291501,
+      "singleton_rate": 0.2507157143417389,
+      "singleton_acc": 0.8681370248709526
+    },
+    "n_sufficient": 30,
+    "best_group_sing": 0.5641106222501572
+  },
+  "agreement_x_confidence": {
+    "overall": {
+      "n": 25499,
+      "coverage": 0.8934468018353661,
+      "mean_set": 5.368837993646809,
+      "singleton_rate": 0.28361896544962545,
+      "singleton_acc": 0.9011338495575221
+    },
+    "groups": {
+      "Agree+High": {
+        "n": 10712,
+        "coverage": 0.9109410007468259,
+        "mean_set": 1.7938760268857357,
+        "median_set": 1.0,
+        "singleton_rate": 0.6751306945481703,
+        "singleton_acc": 0.9011338495575221
+      },
+      "Agree+Low": {
+        "n": 1201,
+        "coverage": 0.9050791007493755,
+        "mean_set": 3.9825145711906744,
+        "median_set": 4.0,
+        "singleton_rate": 0.0,
+        "singleton_acc": 0.0
+      },
+      "Disagree+High": {
+        "n": 9536,
+        "coverage": 0.8784605704697986,
+        "mean_set": 7.5647021812080535,
+        "median_set": 7.0,
+        "singleton_rate": 0.0,
+        "singleton_acc": 0.0
+      },
+      "Disagree+Low": {
+        "n": 4050,
+        "coverage": 0.8790123456790123,
+        "mean_set": 10.065185185185186,
+        "median_set": 10.0,
+        "singleton_rate": 0.0,
+        "singleton_acc": 0.0
+      }
+    },
+    "best_group_sing": 0.6751306945481703
+  }
+}
